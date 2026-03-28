@@ -1,6 +1,17 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include <src/shared.hpp>
 
+namespace
+{
+    constexpr int kTargetWidth = 2560;
+    constexpr int kTargetHeight = 1440;
+
+    constexpr int scale_from_1080p(const int value)
+    {
+        return (value * 4 + 1) / 3;
+    }
+}
+
 bool main()
 {
     LOG("job_helper::fish @ github.com/clauadv/job_helper");
@@ -18,7 +29,7 @@ bool main()
     SetProcessDPIAware();
 
     const auto screen_resolution = shared::ivector2{ GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
-    if (screen_resolution.m_x != 1920 || screen_resolution.m_y != 1080)
+    if (screen_resolution.m_x != kTargetWidth || screen_resolution.m_y != kTargetHeight)
     {
         LOG_ERROR("your screen resolution (%d, %d) is unsupported", screen_resolution.m_x, screen_resolution.m_y);
         this_thread::sleep_for(chrono::seconds(5));
@@ -33,7 +44,10 @@ bool main()
         static auto marker_position = shared::ivector2{ 0, 0 };
         if (marker_position.zero())
         {
-            marker_position = shared::c_pixel::find_marker_position(device_context, shared::ivector2{ 1920, 870 });
+            marker_position = shared::c_pixel::find_marker_position(
+                device_context,
+                shared::ivector2{ kTargetWidth, scale_from_1080p(870) }
+            );
         }
 
         if (!marker_position.zero())
@@ -50,7 +64,11 @@ bool main()
         static auto skillcheck_position = shared::ivector2{ 0, 0 };
         if (skillcheck_position.zero())
         {
-            skillcheck_position = shared::c_pixel::find_skillcheck_position(device_context, shared::ivector2{ 812, 1027 }, shared::ivector2{ 300, 1 });
+            skillcheck_position = shared::c_pixel::find_skillcheck_position(
+                device_context,
+                shared::ivector2{ scale_from_1080p(812), scale_from_1080p(1027) },
+                shared::ivector2{ scale_from_1080p(300), 1 }
+            );
             LOG("found skillcheck position at (%d, %d)", skillcheck_position.m_x, skillcheck_position.m_y);
         }
 
