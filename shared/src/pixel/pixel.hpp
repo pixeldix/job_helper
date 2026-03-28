@@ -21,7 +21,8 @@ namespace shared
             DeleteObject(handle_bitmap_target);
             DeleteDC(device_context_target);
 
-            for (auto y{ 220 }; y < size.m_y; y++)
+            const auto search_start_y = (220 * size.m_y + (870 / 2)) / 870;
+            for (auto y{ search_start_y }; y < size.m_y; y++)
             {
                 for (auto x{ 0 }; x < size.m_x; x++)
                 {
@@ -55,6 +56,7 @@ namespace shared
             DeleteObject(handle_bitmap_target);
             DeleteDC(device_context_target);
 
+            const auto hit_offset = (15 * size.m_x + (300 / 2)) / 300;
             for (auto idx{ 0 }; idx < size.m_x; idx++)
             {
                 const auto pixel = *reinterpret_cast<uint32_t*>(pixels.data() + idx * 4);
@@ -64,7 +66,7 @@ namespace shared
                 if (color.r_between(20, 50) && color.g_between(140, 220) && color.b_between(80, 150))
                 {
                     LOG("found color (%d, %d, %d) at (%d, %d)", color.m_r, color.m_g, color.m_b, position.m_x + idx, position.m_y);
-                    return { position.m_x + idx + 15, position.m_y };
+                    return { position.m_x + idx + hit_offset, position.m_y };
                 }
             }
 
